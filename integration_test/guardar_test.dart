@@ -1,0 +1,24 @@
+// Guarda un PDF y una imagen en el teléfono, como el botón "Descargar".
+// Correr en el emulador: flutter test integration_test/guardar_test.dart -d emulator-5554
+// Después se revisa con adb que estén en Download y en Pictures/Distribuidora AM.
+import 'dart:typed_data';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:integration_test/integration_test.dart';
+import 'package:sistema_pedidos/services/compartir.dart';
+
+void main() {
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+
+  testWidgets('descargar guarda el PDF en Descargas y la imagen en la galería', (_) async {
+    final pdf = Uint8List.fromList('%PDF-1.4\n%prueba\n'.codeUnits);
+    expect(await guardarArchivo(pdf, 'ZZ_prueba_descarga.pdf'), 'Descargas');
+    // PNG de 1x1 píxel.
+    final png = Uint8List.fromList([
+      0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, //
+      0x00, 0x00, 0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89, 0x00, 0x00, 0x00, 0x0D, 0x49, 0x44, 0x41,
+      0x54, 0x78, 0x9C, 0x63, 0xF8, 0xCF, 0xC0, 0xF0, 0x1F, 0x00, 0x05, 0x00, 0x01, 0xFF, 0x89, 0x99, 0x3D, 0x1D, 0x00, 0x00,
+      0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60, 0x82,
+    ]);
+    expect(await guardarArchivo(png, 'ZZ_prueba_descarga.png', esPdf: false, mime: 'image/png'), 'Galería');
+  });
+}
